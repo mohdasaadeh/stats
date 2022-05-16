@@ -1,20 +1,16 @@
-import { MatchResult } from "./enums/MatchResult";
+import { CsvFileReader } from "./ResourceReader";
 import { MatchReader } from "./MatchReader";
+import { MatchSummary } from "./MatchSummary";
+import { WinsAnalyzer } from "./Analyzer";
+import { ConsoleReporter } from "./Reporter";
 
-const { HomeWin, AwayWin } = MatchResult;
+const matchReader = new MatchReader(new CsvFileReader("football.csv"));
 
-const matchReader = new MatchReader("football.csv");
+matchReader.load();
 
-matchReader.read();
+const matchSummary = new MatchSummary(
+  new WinsAnalyzer("Man City"),
+  new ConsoleReporter()
+);
 
-let wins = 0;
-
-for (let match of matchReader.rows) {
-  if (
-    match[2] === "Man United" &&
-    (match[5] === HomeWin || match[5] === AwayWin)
-  )
-    wins++;
-}
-
-console.log(`Man United won ${wins} times`);
+matchSummary.finalize(matchReader.matches);
